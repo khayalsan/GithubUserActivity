@@ -2,7 +2,7 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-
+import com.fasterxml.jackson.databind.*;
 
 public class GithubActivity {
     private static final String API = "https://api.github.com";
@@ -39,8 +39,8 @@ public class GithubActivity {
         int status = response.statusCode();
 
         switch (status) {
-            case 200:
-                throw new RuntimeException("OK");
+//            case 200:
+//                throw new RuntimeException("OK");
             case 304:
                 throw new RuntimeException("Not Modified");
             case 403:
@@ -53,30 +53,48 @@ public class GithubActivity {
     }
 
     private static void parseAndDisplay(String json, String username) {
-//        ObjectMapper;
+        ObjectMapper mapper = new ObjectMapper();
 
-        int count = 0;
-        if (count == 0) {
-            System.out.println("No events found for " + username);
+        try {
+            JsonNode events = mapper.readTree(json);
+            int count = 0;
+
+            for (JsonNode event : events) {
+                String type = event.path("type").asText();
+                String repo = event.path("repo").path("name").asText();
+                String action = event.path("payload").path("action").asText("unknown");
+                int commits =  event.path("payload").path("size").asInt(0);
+                String ref = event.path("payload").path("ref_type").asText("ref");
+
+                String description = describe(type, repo, action, commits, ref);
+                if (description != null) {
+                    System.out.println(description);
+                    count++;
+                }
+            }
+
+            if (count == 0) {
+                System.out.println("No events found for " + username);
+            }
+            else {
+                System.out.println("Total events found " + count + " for " + username);
+            }
         }
-        else {
-            System.out.println("Total events found " + count + " events for " + username);
+        catch (Exception e) {
+            System.err.println("Error: " + e.getMessage());
         }
     }
 
-    private static String describe(String type, String repo, String action, String raw) {
-        return switch (raw) {
-            case "PushEvent" -> {
-                String commits = ""; // = extractCommitCount(raw);
-                yield "Pushed " + commits + " commit(s) to " + repo;
-            }
+    private static String describe(String type, String repo, String action, int commits, String raw) {
+        return switch (type) {
+            case "PushEvent" -> "Pushed " + commits + " commit(s) to " + repo;
             case "IssuesEvent" -> "Issue " + action + " in " + repo;
             case "IssueCommentEvent" -> "Commented in " + repo;
             case "PullRequestEvent" -> "Pull Request " + action + " in " + repo;
             case "PullRequestReviewEvent" -> "Reviewed in " + repo;
             case "PullRequestReviewCommentEvent" -> "Commented on a pull req in " + repo;
-            case "CreateEvent" -> "Created " + raw + " in " + repo;
-            case "DeleteEvent" -> "Deleted " + raw + " in " + repo;
+            case "CreateEvent" -> "Created in " + repo;
+            case "DeleteEvent" -> "Deleted in " + repo;
             case "ForkEvent" -> "Forked " + repo;
             case "WatchEvent" -> "Starred " + repo;
             case "PublicEvent" -> "Made " + repo + " public";
