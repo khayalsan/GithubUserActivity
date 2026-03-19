@@ -63,7 +63,7 @@ public class GithubActivity {
                 String type = event.path("type").asText();
                 String repo = event.path("repo").path("name").asText();
                 String action = event.path("payload").path("action").asText("unknown");
-                int commits =  event.path("payload").path("size").asInt(0);
+                int commits =  event.path("payload").size();
                 String ref = event.path("payload").path("ref_type").asText("ref");
 
                 String description = describe(type, repo, action, commits, ref);
