@@ -4,7 +4,7 @@
          http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>github.com/khayalsan</groupId>
+    <groupId>github.com.khayalsan</groupId>
     <artifactId>github-activity</artifactId>
     <version>1.0</version>
     <name>Github User Activity</name>
@@ -12,6 +12,7 @@
     <properties>
         <maven.compiler.source>25</maven.compiler.source>
         <maven.compiler.target>25</maven.compiler.target>
+        <native.maven.plugin.version>0.10.2</native.maven.plugin.version>
     </properties>
 
     <build>
@@ -19,9 +20,27 @@
             <plugin>
                 <groupId>org.graalvm.buildtools</groupId>
                 <artifactId>native-maven-plugin</artifactId>
-                <version>0.10.2</version>
+                <version>${native.maven.plugin.version}</version>
                 <extensions>true</extensions>
+                <executions>
+                    <execution>
+                        <id>build-native</id>
+                        <goals>
+                            <goal>compile-no-fork</goal>
+                        </goals>
+                        <phase>package</phase>
+                    </execution>
+                </executions>
+                <configuration>
+                    <mainClass>GithubActivity</mainClass>
+                </configuration>
             </plugin>
+<!--            <plugin>-->
+<!--                <groupId>org.graalvm.buildtools</groupId>-->
+<!--                <artifactId>native-maven-plugin</artifactId>-->
+<!--                <version>0.10.2</version>-->
+<!--                <extensions>true</extensions>-->
+<!--            </plugin>-->
         </plugins>
     </build>
 
@@ -29,7 +48,7 @@
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
-            <version>2.21.1</version>
+            <version>2.21.0</version>
         </dependency>
     </dependencies>
 

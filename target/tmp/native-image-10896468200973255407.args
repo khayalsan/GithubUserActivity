@@ -1,0 +1,6 @@
+-cp
+C:\\Khayal\\Backend\\Projects\\GithubUserActivity\\target\\classes;C:\\Users\\User\\.m2\\repository\\com\\fasterxml\\jackson\\core\\jackson-databind\\2.21.0\\jackson-databind-2.21.0.jar;C:\\Users\\User\\.m2\\repository\\com\\fasterxml\\jackson\\core\\jackson-annotations\\2.21\\jackson-annotations-2.21.jar;C:\\Users\\User\\.m2\\repository\\com\\fasterxml\\jackson\\core\\jackson-core\\2.21.0\\jackson-core-2.21.0.jar
+--no-fallback
+-o
+C:\\Khayal\\Backend\\Projects\\GithubUserActivity\\target\\github-activity
+-H:ConfigurationFileDirectories=C:\\Khayal\\Backend\\Projects\\GithubUserActivity\\target\\graalvm-reachability-metadata\\4c23d8635d2d15f817852a4ad8508bc7b6f8ef5c\\com.fasterxml.jackson.core\\jackson-databind\\2.15.2
