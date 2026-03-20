@@ -64,17 +64,15 @@ public class GithubActivity {
                 String repo = event.path("repo").path("name").asText();
                 String action = event.path("payload").path("action").asText("unknown");
 
-                int commits = 0;
-                if (type.equals("PushEvent")) {
-                    commits =  event.path("payload").path("commits").size();
-                }
+//                int commits = 0;
+//                if (type.equals("PushEvent")) {
+//                    commits =  event.path("payload").path("commits").size();
+//                }
 //                String ref = event.path("payload").path("ref_type").asText("ref");
 
-                String description = describe(type, repo, action, commits);
-                if (description != null) {
-                    System.out.println(description);
-                    count++;
-                }
+                String description = describe(type, repo, action);
+                System.out.println(description);
+                count++;
             }
 
             if (count == 0) {
@@ -89,9 +87,9 @@ public class GithubActivity {
         }
     }
 
-    private static String describe(String type, String repo, String action, int commits) {
+    private static String describe(String type, String repo, String action) {
         return switch (type) {
-            case "PushEvent" -> "Pushed " + commits + " commit(s) to " + repo;
+            case "PushEvent" -> "Pushed to " + repo;
             case "IssuesEvent" -> "Issue " + action + " in " + repo;
             case "IssueCommentEvent" -> "Commented in " + repo;
             case "PullRequestEvent" -> "Pull Request " + action + " in " + repo;
