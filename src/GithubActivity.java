@@ -18,7 +18,7 @@ public class GithubActivity {
 
         try {
             String json = fetchEvents(username);
-            parseAndDisplay(json, username);
+            display(json, username);
         }
         catch (Exception e) {
             System.err.println("Error: " + e.getMessage());
@@ -39,8 +39,6 @@ public class GithubActivity {
         int status = response.statusCode();
 
         switch (status) {
-//            case 200:
-//                throw new RuntimeException("OK");
             case 304:
                 throw new RuntimeException("Not Modified");
             case 403:
@@ -48,21 +46,24 @@ public class GithubActivity {
             case 503:
                 throw new RuntimeException("Service Unavailable");
         }
+        if (status != 200) { // 200 = Ok
+            throw new RuntimeException("Unexpected response status: " + status);
+        }
 
         return response.body();
     }
 
-    private static void parseAndDisplay(String json, String username) {
+    private static void display(String json, String username) {
         ObjectMapper mapper = new ObjectMapper();
 
         try {
             JsonNode events = mapper.readTree(json);
-            int count = 0;
+            int count = events.size();
 
             for (JsonNode event : events) {
                 String type = event.path("type").asText();
                 String repo = event.path("repo").path("name").asText();
-                String action = event.path("payload").path("action").asText("unknown");
+                String action = event.path("payload").path("action").asText();
 
 //                int commits = 0;
 //                if (type.equals("PushEvent")) {
@@ -72,7 +73,6 @@ public class GithubActivity {
 
                 String description = describe(type, repo, action);
                 System.out.println(description);
-                count++;
             }
 
             if (count == 0) {
