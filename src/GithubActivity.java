@@ -30,7 +30,7 @@ public class GithubActivity {
         HttpClient client = HttpClient.newHttpClient();
 
         HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(API + "/users/" + username + "/events/public"))
+                .uri(URI.create(API + "/users/" + username + "/events"))
                 .header("User-Agent", "github-activity-cli")
                 .GET().build();
 
@@ -63,10 +63,14 @@ public class GithubActivity {
                 String type = event.path("type").asText();
                 String repo = event.path("repo").path("name").asText();
                 String action = event.path("payload").path("action").asText("unknown");
-                int commits =  event.path("payload").size();
-                String ref = event.path("payload").path("ref_type").asText("ref");
 
-                String description = describe(type, repo, action, commits, ref);
+                int commits = 0;
+                if (type.equals("PushEvent")) {
+                    commits =  event.path("payload").path("commits").size();
+                }
+//                String ref = event.path("payload").path("ref_type").asText("ref");
+
+                String description = describe(type, repo, action, commits);
                 if (description != null) {
                     System.out.println(description);
                     count++;
@@ -85,7 +89,7 @@ public class GithubActivity {
         }
     }
 
-    private static String describe(String type, String repo, String action, int commits, String raw) {
+    private static String describe(String type, String repo, String action, int commits) {
         return switch (type) {
             case "PushEvent" -> "Pushed " + commits + " commit(s) to " + repo;
             case "IssuesEvent" -> "Issue " + action + " in " + repo;
